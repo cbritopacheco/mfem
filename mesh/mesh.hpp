@@ -930,22 +930,22 @@ public:
 
    /** @brief Returns number of vertices.  Vertices are only at the corners of
        elements, where you would expect them in the lowest-order mesh. */
-   inline int GetNV() const { return NumOfVertices; }
+   virtual inline int GetNV() const { return NumOfVertices; }
 
    /// Returns number of elements.
-   inline int GetNE() const { return NumOfElements; }
+   virtual inline int GetNE() const { return NumOfElements; }
 
    /// Returns number of boundary elements.
-   inline int GetNBE() const { return NumOfBdrElements; }
+   virtual inline int GetNBE() const { return NumOfBdrElements; }
 
    /// Return the number of edges.
-   inline int GetNEdges() const { return NumOfEdges; }
+   virtual inline int GetNEdges() const { return NumOfEdges; }
 
    /// Return the number of faces in a 3D mesh.
-   inline int GetNFaces() const { return NumOfFaces; }
+   virtual inline int GetNFaces() const { return NumOfFaces; }
 
    /// Return the number of faces (3D), edges (2D) or vertices (1D).
-   int GetNumFaces() const;
+   virtual int GetNumFaces() const;
 
    /** @brief Return the number of faces (3D), edges (2D) or vertices (1D)
        including ghost faces. */
@@ -1044,8 +1044,8 @@ public:
    inline int EulerNumber2D() const
    { return NumOfVertices - NumOfEdges + NumOfElements; }
 
-   int Dimension() const { return Dim; }
-   int SpaceDimension() const { return spaceDim; }
+   virtual int Dimension() const { return Dim; }
+   virtual int SpaceDimension() const { return spaceDim; }
 
    /// @brief Return pointer to vertex i's coordinates.
    /// @warning For high-order meshes (when #Nodes != NULL) vertices may not be
@@ -1082,16 +1082,16 @@ public:
 
    Element *GetElement(int i) { return elements[i]; }
 
-   const Element *GetBdrElement(int i) const { return boundary[i]; }
+   virtual const Element *GetBdrElement(int i) const { return boundary[i]; }
 
-   Element *GetBdrElement(int i) { return boundary[i]; }
+   virtual Element *GetBdrElement(int i) { return boundary[i]; }
 
-   const Element *GetFace(int i) const { return faces[i]; }
+   virtual const Element *GetFace(int i) const { return faces[i]; }
 
    /// Return the Geometry::Type associated with face @a i.
-   Geometry::Type GetFaceGeometry(int i) const;
+   virtual Geometry::Type GetFaceGeometry(int i) const;
 
-   Geometry::Type GetElementGeometry(int i) const
+   virtual Geometry::Type GetElementGeometry(int i) const
    {
       return elements[i]->GetGeometryType();
    }
@@ -1105,7 +1105,7 @@ public:
    MFEM_DEPRECATED Geometry::Type GetFaceBaseGeometry(int i) const
    { return GetFaceGeometry(i); }
 
-   Geometry::Type GetElementBaseGeometry(int i) const
+   virtual Geometry::Type GetElementBaseGeometry(int i) const
    { return GetElementGeometry(i); }
 
    Geometry::Type GetBdrElementBaseGeometry(int i) const
@@ -1119,7 +1119,7 @@ public:
    /** @brief Return the number of geometries of the given dimension present in
        the mesh. */
    /** For a parallel mesh only the local geometries are counted. */
-   int GetNumGeometries(int dim) const;
+   virtual int GetNumGeometries(int dim) const;
 
    /// Return all element geometries of the given dimension present in the mesh.
    /** For a parallel mesh only the local geometries are returned.
@@ -1145,7 +1145,7 @@ public:
    };
 
    /// Returns the indices of the vertices of element i.
-   void GetElementVertices(int i, Array<int> &v) const
+   virtual void GetElementVertices(int i, Array<int> &v) const
    { elements[i]->GetVertices(v); }
 
    /// Returns the indices of the vertices of boundary element i.
@@ -1153,17 +1153,17 @@ public:
    { boundary[i]->GetVertices(v); }
 
    /// Return the indices and the orientations of all edges of element i.
-   void GetElementEdges(int i, Array<int> &edges, Array<int> &cor) const;
+   virtual void GetElementEdges(int i, Array<int> &edges, Array<int> &cor) const;
 
    /// Return the indices and the orientations of all edges of bdr element i.
    void GetBdrElementEdges(int i, Array<int> &edges, Array<int> &cor) const;
 
    /** Return the indices and the orientations of all edges of face i.
        Works for both 2D (face=edge) and 3D faces. */
-   void GetFaceEdges(int i, Array<int> &edges, Array<int> &o) const;
+   virtual void GetFaceEdges(int i, Array<int> &edges, Array<int> &o) const;
 
    /// Returns the indices of the vertices of face i.
-   void GetFaceVertices(int i, Array<int> &vert) const
+   virtual void GetFaceVertices(int i, Array<int> &vert) const
    {
       if (Dim == 1)
       {
@@ -1185,7 +1185,7 @@ public:
    Table *GetEdgeVertexTable() const;
 
    /// Return the indices and the orientations of all faces of element i.
-   void GetElementFaces(int i, Array<int> &faces, Array<int> &ori) const;
+   virtual void GetElementFaces(int i, Array<int> &faces, Array<int> &ori) const;
 
    /** @brief Returns the sorted, unique indices of elements sharing a face with
        element @a elem, including @a elem. */
@@ -1197,7 +1197,7 @@ public:
    /** Return the vertex index of boundary element i. (1D)
        Return the edge index of boundary element i. (2D)
        Return the face index of boundary element i. (3D) */
-   int GetBdrElementEdgeIndex(int i) const;
+   virtual int GetBdrElementEdgeIndex(int i) const;
 
    /** @brief For the given boundary element, bdr_el, return its adjacent
        element and its info, i.e. 64*local_bdr_index+bdr_orientation.
@@ -1206,7 +1206,7 @@ public:
        the respective face element.
 
        @sa GetBdrElementAdjacentElement2() */
-   void GetBdrElementAdjacentElement(int bdr_el, int &el, int &info) const;
+   virtual void GetBdrElementAdjacentElement(int bdr_el, int &el, int &info) const;
 
    /** @brief For the given boundary element, bdr_el, return its adjacent
        element and its info, i.e. 64*local_bdr_index+inverse_bdr_orientation.
@@ -1733,13 +1733,13 @@ public:
    const CoarseFineTransformations &GetRefinementTransforms();
 
    /// Return type of last modification of the mesh.
-   Operation GetLastOperation() const { return last_operation; }
+   virtual Operation GetLastOperation() const { return last_operation; }
 
    /** Return update counter. The counter starts at zero and is incremented
        each time refinement, derefinement, or rebalancing method is called.
        It is used for checking proper sequence of Space:: and GridFunction::
        Update() calls. */
-   long GetSequence() const { return sequence; }
+   virtual long GetSequence() const { return sequence; }
 
    /// Print the mesh to the given stream using Netgen/Truegrid format.
    virtual void PrintXG(std::ostream &os = mfem::out) const;
